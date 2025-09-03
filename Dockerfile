@@ -1,6 +1,7 @@
+# Utiliser PHP 8.3 avec Apache
 FROM php:8.3-apache
 
-# Installer dépendances système + extensions PHP nécessaires à Symfony
+# Installer les dépendances système nécessaires et extensions PHP
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -10,32 +11,29 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     zip \
     unzip \
-    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
+    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip \
+    && a2enmod rewrite \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-# Installer Composer
+# Installer Composer depuis l'image officielle
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-
-# Activer mod_rewrite (utile pour Symfony routes)
-RUN a2enmod rewrite
 
 # Définir le répertoire de travail
 WORKDIR /var/www/html
 
-# Copier d’abord composer.json et composer.lock pour tirer parti du cache Docker
+# Copier uniquement les fichiers Composer pour optimiser le cache Docker
 COPY composer.json composer.lock ./
 
-# Installer dépendances Symfony en mode prod (pas de dev tools)
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+# Installer les dépendances PHP en production (sans dev)
+RUN composer install --optimize-autoloader --no-interaction
 
-# Copier tout le projet
+# Copier le reste du projet
 COPY . .
 
-# Fixer les permissions (Apache = www-data)
+# Fixer les permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
 
-# Exposer le port 80 (par défaut, Railway remplacera par $PORT)
-EXPOSE 80
-
-# Écrire le bon port dans Apache au runtime et démarrer Apache
-CMD sh -c "echo \"Listen 0.0.0.0:${PORT}\" > /etc/apache2/ports.conf && apache2-foreground"
+# Démarrage par défaut d'Apache
+CMD ["apache2-foreground"]
