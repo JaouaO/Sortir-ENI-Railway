@@ -1,1 +1,1 @@
-web: symfony server:start --no-tls --port $PORT
+web: php -S 0.0.0.0:$PORT -t public
