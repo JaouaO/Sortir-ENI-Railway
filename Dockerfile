@@ -24,7 +24,7 @@ WORKDIR /var/www/html
 COPY composer.json composer.lock ./
 
 # Installer les dépendances PHP directement dans l’image
-RUN composer install --no-interaction --no-dev --optimize-autoloader
+RUN composer install --no-interaction --optimize-autoloader
 
 # Puis copier le reste du projet
 COPY . .
