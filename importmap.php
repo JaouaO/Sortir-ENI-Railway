@@ -3,36 +3,38 @@
 /**
  * Returns the importmap for this application.
  *
- * - "path" is a path inside the asset mapper system. Use the
- *     "debug:asset-map" command to see the full list of paths.
- *
- * - "entrypoint" (JavaScript only) set to true for any module that will
- *     be used as an "entrypoint" (and passed to the importmap() Twig function).
- *
- * The "importmap:require" command can be used to add new entries to this file.
+ * - "path" is a path inside the asset mapper system.
+ * - "entrypoint" (JavaScript only) set to true for any module used as an "entrypoint".
  */
 return [
     'app' => [
         'path' => './assets/app.js',
         'entrypoint' => true,
     ],
+
+    // Hotwired Stimulus
     '@hotwired/stimulus' => [
-        'version' => '3.2.2',
+        'path' => './assets/vendor/@hotwired/stimulus/stimulus.index.js',
     ],
-    '@symfony/stimulus-bundle' => [
-        'path' => './vendor/symfony/stimulus-bundle/assets/dist/loader.js',
-    ],
+
+    // Hotwired Turbo
     '@hotwired/turbo' => [
-        'version' => '7.3.0',
+        'path' => './assets/vendor/@hotwired/turbo/turbo.index.js',
     ],
+
+    // Bootstrap JS
     'bootstrap' => [
-        'version' => '5.3.8',
+        'path' => './assets/vendor/bootstrap/bootstrap.index.js',
     ],
+
+    // Popper.js (Bootstrap dependency)
     '@popperjs/core' => [
-        'version' => '2.11.8',
+        'path' => './assets/vendor/@popperjs/core/core.index.js',
     ],
+
+    // Bootstrap CSS
     'bootstrap/dist/css/bootstrap.min.css' => [
-        'version' => '5.3.8',
+        'path' => './assets/vendor/bootstrap/dist/css/bootstrap.min.css',
         'type' => 'css',
     ],
 ];
