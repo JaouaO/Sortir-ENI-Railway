@@ -1,29 +1,19 @@
 <?php
 
 /**
- * Returns the importmap for this application.
- *
- * - "path" is a path inside the asset mapper system. Use the
- *     "debug:asset-map" command to see the full list of paths.
- *
- * - "entrypoint" (JavaScript only) set to true for any module that will
- *     be used as an "entrypoint" (and passed to the importmap() Twig function).
- *
- * The "importmap:require" command can be used to add new entries to this file.
+ * Importmap configuration for AssetMapper.
  */
+
 return [
     'app' => [
         'path' => './assets/app.js',
         'entrypoint' => true,
     ],
     '@hotwired/stimulus' => [
-        'path' => './vendor/@hotwired/stimulus.js',
+        'path' => 'https://cdn.jsdelivr.net/npm/@hotwired/stimulus@3.2.2/dist/stimulus.umd.js',
     ],
-    '@symfony/stimulus-bundle' => [
-        'path' => './vendor/symfony/stimulus-bundle/assets/dist/loader.js',
-    ],
-    '@hotwired/turbo' => [
-        'version' => '8.0.13',
+    '@hotwired/turbo-rails' => [
+        'path' => 'https://cdn.jsdelivr.net/npm/@hotwired/turbo-rails@8.0.16/dist/turbo.es2017-umd.js',
     ],
     'bootstrap' => [
         'version' => '5.3.8',
@@ -35,11 +25,4 @@ return [
         'version' => '5.3.8',
         'type' => 'css',
     ],
-    '@hotwired/turbo-rails' => [
-        'path' => './vendor/@hotwired/turbo-rails.js',
-    ],
-    '@rails/actioncable/src' => [
-        'version' => '8.0.200',
-    ],
-
 ];
