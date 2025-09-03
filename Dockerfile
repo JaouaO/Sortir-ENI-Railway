@@ -1,6 +1,6 @@
 FROM php:8.3-apache
 
-# Installer dépendances système
+# Installer dépendances système + extensions PHP nécessaires à Symfony
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -15,34 +15,27 @@ RUN apt-get update && apt-get install -y \
 # Installer Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Activer le module rewrite d'Apache
+# Activer mod_rewrite (utile pour Symfony routes)
 RUN a2enmod rewrite
 
-# Adapter Apache au port fourni par Railway
-RUN echo "Listen ${PORT}" > /etc/apache2/ports.conf \
-    && echo "<VirtualHost *:${PORT}>\n\
-    DocumentRoot /var/www/html/public\n\
-    <Directory /var/www/html/public>\n\
-        AllowOverride All\n\
-        Require all granted\n\
-    </Directory>\n\
-</VirtualHost>" > /etc/apache2/sites-available/000-default.conf
-
-# Définir le dossier de travail
+# Définir le répertoire de travail
 WORKDIR /var/www/html
 
-# Étape 1 : copier uniquement composer.json et composer.lock (pour le cache)
+# Copier d’abord composer.json et composer.lock pour tirer parti du cache Docker
 COPY composer.json composer.lock ./
 
-# Étape 2 : installer les dépendances PHP sans exécuter les scripts (car bin/console n’est pas encore là)
-RUN composer install --no-interaction --no-scripts --optimize-autoloader
+# Installer dépendances Symfony en mode prod (pas de dev tools)
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Étape 3 : copier le reste du projet
+# Copier tout le projet
 COPY . .
 
-# Étape 4 : exécuter les scripts post-install (maintenant bin/console existe)
-RUN composer run-script --no-interaction post-install-cmd || true
-
-# Fixer les permissions
+# Fixer les permissions (Apache = www-data)
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
+
+# Exposer le port 80 (par défaut, Railway remplacera par $PORT)
+EXPOSE 80
+
+# Écrire le bon port dans Apache au runtime et démarrer Apache
+CMD sh -c "echo \"Listen 0.0.0.0:${PORT}\" > /etc/apache2/ports.conf && apache2-foreground"
