@@ -1,0 +1,29 @@
+services:
+  app:
+    build: .
+    container_name: symfony_app
+    ports:
+      - "8000:80"
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - database
+    environment:
+      - DATABASE_URL=mysql://symfony:password@database:3306/symfony_db
+      - APP_ENV=dev
+
+  database:
+    image: mysql:8.0  # ← AJOUT CRUCIAL !
+    container_name: symfony_db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: symfony_db
+      MYSQL_USER: symfony
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
