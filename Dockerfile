@@ -1,6 +1,6 @@
 FROM php:8.3-apache
 
-# Installer les dépendances système
+# Installer dépendances système
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -15,26 +15,24 @@ RUN apt-get update && apt-get install -y \
 # Installer Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Activer rewrite Apache
+# Activer le module rewrite d'Apache
 RUN a2enmod rewrite
 
+# Définir le dossier de travail
 WORKDIR /var/www/html
 
-# Copier composer.* avant (meilleur cache Docker)
+# Étape 1 : copier uniquement composer.json et composer.lock (pour le cache)
 COPY composer.json composer.lock ./
 
-# Installer les dépendances PHP directement dans l’image
-RUN composer install --no-interaction --optimize-autoloader
+# Étape 2 : installer les dépendances PHP sans exécuter les scripts (car bin/console n’est pas encore là)
+RUN composer install --no-interaction --no-scripts --optimize-autoloader
 
-# Puis copier le reste du projet
+# Étape 3 : copier le reste du projet
 COPY . .
 
-# Compiler les assets (si tu utilises AssetMapper)
-RUN php bin/console asset-map:compile || true
+# Étape 4 : exécuter les scripts post-install (maintenant bin/console existe)
+RUN composer run-script --no-interaction post-install-cmd || true
 
 # Fixer les permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
-
-EXPOSE 8000
-CMD ["php", "-S", "0.0.0.0:8000", "-t", "public"]
