@@ -18,6 +18,16 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 # Activer le module rewrite d'Apache
 RUN a2enmod rewrite
 
+# Adapter Apache au port fourni par Railway
+RUN echo "Listen ${PORT}" > /etc/apache2/ports.conf \
+    && echo "<VirtualHost *:${PORT}>\n\
+    DocumentRoot /var/www/html/public\n\
+    <Directory /var/www/html/public>\n\
+        AllowOverride All\n\
+        Require all granted\n\
+    </Directory>\n\
+</VirtualHost>" > /etc/apache2/sites-available/000-default.conf
+
 # Définir le dossier de travail
 WORKDIR /var/www/html
 
