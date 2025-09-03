@@ -25,8 +25,8 @@ WORKDIR /var/www/html
 # Copier uniquement les fichiers Composer pour profiter du cache Docker
 COPY composer.json composer.lock ./
 
-# Installer les dépendances sans exécuter les scripts auto
-RUN composer install  --optimize-autoloader --no-interaction --no-scripts
+# Installer les dépendances sans exécuter les scripts Symfony
+RUN composer install --optimize-autoloader --no-interaction --no-scripts
 
 # Copier le reste du projet
 COPY . .
@@ -34,6 +34,9 @@ COPY . .
 # Fixer les permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
+
+# **Configurer Apache pour pointer sur /public**
+RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/public|' /etc/apache2/sites-available/000-default.conf
 
 # Configurer Apache pour écouter sur le port fourni par Railway
 CMD sh -c "echo \"Listen 0.0.0.0:${PORT}\" > /etc/apache2/ports.conf && apache2-foreground"
