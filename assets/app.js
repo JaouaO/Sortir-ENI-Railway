@@ -14,7 +14,6 @@ window.Turbo = Turbo;
 // Initialiser Stimulus
 window.Stimulus = Application.start();
 
-// Styles personnalisés (via AssetMapper)
 import './styles/app.css';
 
 console.log('App.js loaded: Stimulus + Turbo actifs!');
