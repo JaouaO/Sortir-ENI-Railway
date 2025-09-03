@@ -27,6 +27,12 @@ final class MainController extends AbstractController
     }
 
 
+    #[Route('/test', name: 'main')]
+    public function test(): Response
+    {
+        return new Response(getenv('DATABASE_URL'));
+    }
+
     #[Route(['/', '/accueil'], name: 'home')]
     public function index(Request $request): Response
     {
