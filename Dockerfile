@@ -1,5 +1,6 @@
 FROM php:8.3-apache
-# Mettre à jour et installer les dépendances
+
+# Installer les dépendances système
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -12,17 +13,28 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
 
 # Installer Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Activer le rewrite Apache
+# Activer rewrite Apache
 RUN a2enmod rewrite
 
-# Définir le répertoire de travail
 WORKDIR /var/www/html
 
-# Copier les fichiers du projet
+# Copier composer.* avant (meilleur cache Docker)
+COPY composer.json composer.lock ./
+
+# Installer les dépendances PHP directement dans l’image
+RUN composer install --no-interaction --no-dev --optimize-autoloader
+
+# Puis copier le reste du projet
 COPY . .
+
+# Compiler les assets (si tu utilises AssetMapper)
+RUN php bin/console asset-map:compile || true
 
 # Fixer les permissions
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
+
+EXPOSE 8000
+CMD ["php", "-S", "0.0.0.0:8000", "-t", "public"]
