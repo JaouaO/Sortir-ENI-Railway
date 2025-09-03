@@ -5,9 +5,16 @@ import './bootstrap.js';
  * This file will be included onto the page via the importmap() Twig function,
  * which should already be in your base.html.twig.
  */
-import './vendor/bootstrap/dist/css/bootstrap.min.css';
+import { Turbo } from "@hotwired/turbo-rails";
+import { Application } from "@hotwired/stimulus";
+
+// Initialiser Turbo
+window.Turbo = Turbo;
+
+// Initialiser Stimulus
+window.Stimulus = Application.start();
+
+// Styles personnalisés (via AssetMapper)
 import './styles/app.css';
 
-import 'bootstrap';
-
-console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
+console.log('App.js loaded: Stimulus + Turbo actifs!');
