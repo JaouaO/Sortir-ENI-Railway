@@ -11,7 +11,13 @@
     {% endblock %}
 
     {% block javascripts %}
-        <script src="{{ asset('assets/app.js') }}"></script>    {% endblock %}
+        <!-- Turbo + Stimulus via CDN -->
+        <script src="https://unpkg.com/stimulus/dist/stimulus.umd.js"></script>
+        <script src="/static/js/controllers/dropdown_controller.js"></script>    <!-- Bootstrap JS via CDN -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+        <!-- Ton JS personnalisé -->
+        <script src="{{ asset('assets/app.js') }}" defer></script>
+    {% endblock %}
 
 
 </head>
